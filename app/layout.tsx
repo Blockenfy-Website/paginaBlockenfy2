@@ -10,7 +10,7 @@ import { WhatsAppButton } from "@/components/whatsapp-button"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Weltivation - Transform Your Business",
+  title: "Blockenfy - Transform Your Business",
   description: "Revolutionary technology solutions that drive growth and innovation",
   generator: "v0.app",
 }

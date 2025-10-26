@@ -67,7 +67,7 @@ export function ExpertiseSection(): ReactElement {
     },
   ]
 
-  
+
   const [current, setCurrent] = useState(0)
 
   const nextVideo = () => setCurrent((prev) => (prev + 1) % reels.length)
@@ -91,7 +91,6 @@ export function ExpertiseSection(): ReactElement {
           </motion.div>
 
           <motion.div
-            variants={itemVariants}
             className="flex-1 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12"
           >
             {/* Left side: Reel Video */}
