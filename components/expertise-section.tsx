@@ -67,6 +67,7 @@ export function ExpertiseSection(): ReactElement {
     },
   ]
 
+  
   const [current, setCurrent] = useState(0)
 
   const nextVideo = () => setCurrent((prev) => (prev + 1) % reels.length)
