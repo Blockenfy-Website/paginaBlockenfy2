@@ -51,6 +51,7 @@ function ImageUploader({ onImageSelect, currentImage, className }: ImageUploader
         body: formData,
       })
 
+      
       const data = await response.json()
 
       if (data.success) {
