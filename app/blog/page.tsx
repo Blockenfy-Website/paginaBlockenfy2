@@ -1,16 +1,62 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
-import { Calendar, User, ArrowRight } from "lucide-react"
+import { Calendar, User, ArrowRight, Loader2 } from "lucide-react"
 import { NavBar } from "@/components/nav-bar"
 import { Footer } from "@/components/footer"
 import { useLanguage } from "@/contexts/language-context"
-import { blogPosts } from "@/lib/blog-data"
+
+interface BlogPost {
+  _id: string
+  slug: string
+  title: {
+    es: string
+    en: string
+  }
+  excerpt: {
+    es: string
+    en: string
+  }
+  image: string
+  date: string
+  author: {
+    name: string
+    role: {
+      es: string
+      en: string
+    }
+  }
+}
 
 export default function BlogPage() {
   const { t, currentLanguage } = useLanguage()
+  const [posts, setPosts] = useState<BlogPost[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    fetchPosts()
+  }, [])
+
+  const fetchPosts = async () => {
+    try {
+      const response = await fetch("/api/posts?published=true")
+      const data = await response.json()
+      
+      if (data.success) {
+        setPosts(data.posts)
+      } else {
+        setError(data.error || "Error al cargar posts")
+      }
+    } catch (error) {
+      setError("Error de conexión")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <main className="relative min-h-screen bg-black text-foreground">
@@ -54,8 +100,23 @@ export default function BlogPage() {
         {/* Blog Grid */}
         <section className="py-16 px-4 sm:px-6">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {blogPosts.map((post, index) => (
+            {isLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full"
+                />
+              </div>
+            ) : error ? (
+              <div className="text-center py-12">
+                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 max-w-md mx-auto">
+                  {error}
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {posts.map((post, index) => (
                 <motion.article
                   key={post.slug}
                   initial={{ opacity: 0, y: 20 }}
@@ -117,8 +178,9 @@ export default function BlogPage() {
                     </div>
                   </Link>
                 </motion.article>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

@@ -1,25 +1,101 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
-import { Calendar, User, ArrowLeft } from "lucide-react"
+import { Calendar, User, ArrowLeft, Loader2 } from "lucide-react"
 import { NavBar } from "@/components/nav-bar"
 import { Footer } from "@/components/footer"
 import { useLanguage } from "@/contexts/language-context"
-import { blogPosts } from "@/lib/blog-data"
 import { notFound } from "next/navigation"
 import { Button } from "@/components/ui/button"
 
-export default function BlogPostPage({ params }: { params: { slug: string } }) {
+interface BlogPost {
+  _id: string
+  slug: string
+  title: {
+    es: string
+    en: string
+  }
+  excerpt: {
+    es: string
+    en: string
+  }
+  content: {
+    es: string
+    en: string
+  }
+  image: string
+  date: string
+  author: {
+    name: string
+    role: {
+      es: string
+      en: string
+    }
+  }
+}
+
+export default function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { t, currentLanguage } = useLanguage()
-  const post = blogPosts.find((p) => p.slug === params.slug)
+  const [post, setPost] = useState<BlogPost | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    fetchPost()
+  }, [])
+
+  const fetchPost = async () => {
+    try {
+      const { slug } = await params
+      const response = await fetch(`/api/posts/${slug}`)
+      const data = await response.json()
+      
+      if (data.success) {
+        setPost(data.post)
+      } else if (response.status === 404) {
+        notFound()
+      } else {
+        setError(data.error || "Error al cargar el post")
+      }
+    } catch (error) {
+      setError("Error de conexión")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const lang = currentLanguage.code as "es" | "en"
+
+  if (isLoading) {
+    return (
+      <main className="relative min-h-screen bg-black text-foreground flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full"
+        />
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="relative min-h-screen bg-black text-foreground flex items-center justify-center">
+        <div className="text-center">
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 max-w-md">
+            {error}
+          </div>
+        </div>
+      </main>
+    )
+  }
 
   if (!post) {
     notFound()
   }
-
-  const lang = currentLanguage.code as "es" | "en"
 
   return (
     <main className="relative min-h-screen bg-black text-foreground">

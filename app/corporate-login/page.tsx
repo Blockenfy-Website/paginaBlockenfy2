@@ -57,10 +57,10 @@ export default function CorporateLogin() {
             transition={{ duration: 0.6 }}
             className="flex flex-col items-center"
           >
-            <img src="/images/weltivation-logo.png" alt="Weltivation" className="w-48 h-12 object-contain mb-2" />
+          
             <div className="inline-flex items-center space-x-2 px-3 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/20">
               <Sparkles className="w-3 h-3 text-emerald-400" />
-              <span className="text-xs font-medium text-emerald-400">Dashboard Access</span>
+              <span className="text-xs font-medium text-emerald-400">Dashboard Access - Blockenfy</span>
             </div>
           </motion.div>
         </Link>
