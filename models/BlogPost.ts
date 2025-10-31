@@ -76,8 +76,9 @@ const BlogPostSchema = new Schema<IBlogPost>({
   },
   image: {
     type: String,
-    required: true,
-    trim: true
+    required: false,
+    trim: true,
+    default: "/placeholder.svg"
   },
   date: {
     type: String,

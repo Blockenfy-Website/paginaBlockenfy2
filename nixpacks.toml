@@ -2,10 +2,7 @@
 nixPkgs = ["nodejs_18", "pnpm-9_x"]
 
 [phases.install]
-cmds = [
-  "pnpm config set strict-peer-dependencies false",
-  "pnpm install --no-frozen-lockfile --shamefully-hoist"
-]
+cmds = ["pnpm i --no-frozen-lockfile || pnpm i"]
 
 [phases.build]
 cmds = ["pnpm run build"]

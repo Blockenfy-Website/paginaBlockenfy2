@@ -70,6 +70,7 @@ export const POST = withAuth(async (req: NextRequest) => {
 
     const post = new BlogPost({
       ...data,
+      image: data.image || "/placeholder.svg",
       published: data.published !== undefined ? data.published : true
     })
 
@@ -80,10 +81,19 @@ export const POST = withAuth(async (req: NextRequest) => {
       post
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Create post error:', error)
+    
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors || {}).map((err: any) => err.message)
+      return NextResponse.json(
+        { error: 'Error de validación', details: validationErrors },
+        { status: 400 }
+      )
+    }
+    
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: error.message || 'Error interno del servidor' },
       { status: 500 }
     )
   }

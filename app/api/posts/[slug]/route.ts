@@ -68,7 +68,11 @@ export const PUT = withAuth(async (
     // Actualizar campos
     Object.keys(data).forEach(key => {
       if (data[key] !== undefined) {
-        post[key] = data[key]
+        if (key === 'image' && !data.image) {
+          post[key] = "/placeholder.svg"
+        } else {
+          post[key] = data[key]
+        }
       }
     })
 
