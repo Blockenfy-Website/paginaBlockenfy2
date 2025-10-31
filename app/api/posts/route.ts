@@ -51,8 +51,12 @@ export const POST = withAuth(async (req: NextRequest) => {
 
     const data = await req.json()
     
+    console.log("📥 Datos recibidos en POST /api/posts:", JSON.stringify(data, null, 2))
+    console.log("🖼️ Imagen recibida:", data.image)
+    
     // Validar datos requeridos
     if (!data.slug || !data.title?.es || !data.title?.en || !data.excerpt?.es || !data.excerpt?.en || !data.content?.es || !data.content?.en) {
+      console.error("❌ Faltan campos requeridos")
       return NextResponse.json(
         { error: 'Faltan campos requeridos' },
         { status: 400 }
@@ -62,19 +66,27 @@ export const POST = withAuth(async (req: NextRequest) => {
     // Verificar que el slug no exista
     const existingPost = await BlogPost.findOne({ slug: data.slug })
     if (existingPost) {
+      console.error("❌ Slug ya existe:", data.slug)
       return NextResponse.json(
         { error: 'Ya existe un post con este slug' },
         { status: 400 }
       )
     }
 
-    const post = new BlogPost({
+    const postData = {
       ...data,
       image: data.image || "/placeholder.svg",
       published: data.published !== undefined ? data.published : true
-    })
+    }
+    
+    console.log("📝 Datos del post a crear:", JSON.stringify(postData, null, 2))
+    console.log("🖼️ Imagen final:", postData.image)
 
+    const post = new BlogPost(postData)
+
+    console.log("💾 Intentando guardar post...")
     await post.save()
+    console.log("✅ Post guardado exitosamente:", post._id)
 
     return NextResponse.json({
       success: true,

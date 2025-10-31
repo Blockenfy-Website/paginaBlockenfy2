@@ -174,13 +174,21 @@ export default function PostForm({ postId, isEdit = false }: PostFormProps) {
 
       const data = await response.json()
       
+      console.log("📥 Respuesta del servidor:", data)
+      
       if (data.success) {
+        console.log("✅ Post guardado exitosamente")
         startTransition(() => router.push("/admin/dashboard"))
       } else {
+        console.error("❌ Error del servidor:", data.error, data.details)
         setError(data.error || "Error al guardar post")
+        if (data.details) {
+          console.error("Detalles del error:", data.details)
+        }
       }
-    } catch (error) {
-      setError("Error de conexión")
+    } catch (error: any) {
+      console.error("❌ Error de conexión:", error)
+      setError(`Error de conexión: ${error.message || "Error desconocido"}`)
     } finally {
       setIsLoading(false)
     }
