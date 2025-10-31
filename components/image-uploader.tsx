@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, memo, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -16,11 +16,13 @@ function ImageUploader({ onImageSelect, currentImage, className }: ImageUploader
   const [isUploading, setIsUploading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState("")
+  const [previewImage, setPreviewImage] = useState<string | undefined>(currentImage)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Log cuando cambia la imagen actual
+  // Sincronizar preview con currentImage
   useEffect(() => {
     console.log("🖼️ ImageUploader - currentImage actualizada:", currentImage)
+    setPreviewImage(currentImage)
   }, [currentImage])
 
   const handleFile = async (file: File) => {
@@ -66,8 +68,9 @@ function ImageUploader({ onImageSelect, currentImage, className }: ImageUploader
       if (data.success && data.url) {
         console.log("✅ Imagen subida exitosamente:", data.url)
         console.log("📞 Llamando onImageSelect con:", data.url)
+        setPreviewImage(data.url)
         onImageSelect(data.url)
-        console.log("✅ Callback ejecutado")
+        console.log("✅ Callback ejecutado, preview actualizado")
       } else {
         const errorMsg = data.error || "Error al subir imagen"
         console.error("❌ Error al subir imagen:", errorMsg, data)
@@ -112,6 +115,7 @@ function ImageUploader({ onImageSelect, currentImage, className }: ImageUploader
   }
 
   const removeImage = () => {
+    setPreviewImage(undefined)
     onImageSelect("")
   }
 
@@ -125,7 +129,7 @@ function ImageUploader({ onImageSelect, currentImage, className }: ImageUploader
         className="hidden"
       />
 
-      {currentImage ? (
+      {previewImage ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -135,9 +139,13 @@ function ImageUploader({ onImageSelect, currentImage, className }: ImageUploader
             <CardContent className="p-4">
               <div className="relative">
                 <img
-                  src={currentImage}
+                  src={previewImage}
                   alt="Preview"
                   className="w-full h-48 object-cover rounded-lg"
+                  onError={(e) => {
+                    console.error("❌ Error al cargar imagen:", previewImage)
+                    e.currentTarget.src = "/placeholder.svg"
+                  }}
                 />
                 <Button
                   variant="destructive"
@@ -229,4 +237,4 @@ function ImageUploader({ onImageSelect, currentImage, className }: ImageUploader
   )
 }
 
-export default memo(ImageUploader)
+export default ImageUploader
