@@ -62,5 +62,5 @@ export function deleteFile(filename: string): boolean {
 
 // Función para obtener la URL pública del archivo
 export function getPublicUrl(filename: string): string {
-  return `/uploads/${filename}`
+  return `/api/uploads/${filename}`
 }
