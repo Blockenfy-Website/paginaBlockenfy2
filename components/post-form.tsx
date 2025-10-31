@@ -103,10 +103,15 @@ export default function PostForm({ postId, isEdit = false }: PostFormProps) {
   }
 
   const handleInputChange = useCallback((field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }))
+    console.log(`📝 Actualizando ${field}:`, value)
+    setFormData(prev => {
+      const updated = {
+        ...prev,
+        [field]: value
+      }
+      console.log("📦 formData actualizado:", updated)
+      return updated
+    })
   }, [])
 
   const handleNestedInputChange = useCallback((parent: string, child: string, value: string) => {
@@ -143,10 +148,20 @@ export default function PostForm({ postId, isEdit = false }: PostFormProps) {
     setIsLoading(true)
     setError("")
 
+    console.log("🚀 Enviando formulario con datos:", formData)
+    console.log("🖼️ Imagen en formData:", formData.image)
+
     try {
       const token = localStorage.getItem("admin_token")
       const url = isEdit ? `/api/posts/${postId}` : "/api/posts"
       const method = isEdit ? "PUT" : "POST"
+
+      const payload = {
+        ...formData,
+        image: formData.image || "/placeholder.svg"
+      }
+
+      console.log("📤 Payload que se envía:", payload)
 
       const response = await fetch(url, {
         method,
@@ -154,7 +169,7 @@ export default function PostForm({ postId, isEdit = false }: PostFormProps) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       })
 
       const data = await response.json()

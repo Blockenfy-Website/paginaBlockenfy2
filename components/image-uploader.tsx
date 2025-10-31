@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, memo } from "react"
+import { useState, useRef, memo, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -17,6 +17,11 @@ function ImageUploader({ onImageSelect, currentImage, className }: ImageUploader
   const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Log cuando cambia la imagen actual
+  useEffect(() => {
+    console.log("🖼️ ImageUploader - currentImage actualizada:", currentImage)
+  }, [currentImage])
 
   const handleFile = async (file: File) => {
     if (!file) return
@@ -54,10 +59,19 @@ function ImageUploader({ onImageSelect, currentImage, className }: ImageUploader
       
       const data = await response.json()
 
-      if (data.success) {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      if (data.success && data.url) {
+        console.log("✅ Imagen subida exitosamente:", data.url)
+        console.log("📞 Llamando onImageSelect con:", data.url)
         onImageSelect(data.url)
+        console.log("✅ Callback ejecutado")
       } else {
-        setError(data.error || "Error al subir imagen")
+        const errorMsg = data.error || "Error al subir imagen"
+        console.error("❌ Error al subir imagen:", errorMsg, data)
+        setError(errorMsg)
       }
     } catch (error) {
       setError("Error de conexión")
