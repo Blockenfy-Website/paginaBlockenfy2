@@ -13,6 +13,10 @@ export const metadata: Metadata = {
   title: "Blockenfy - Transform Your Business",
   description: "Revolutionary technology solutions that drive growth and innovation",
   generator: "v0.app",
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+  },
 }
 
 export default function RootLayout({
